@@ -4,7 +4,7 @@ import MatchBar from '../components/MatchBar';
 import StatusBadge from '../components/StatusBadge';
 
 export default function Dashboard({ setActiveTab }) {
-  const { jobs, stats, platforms } = useJobs();
+  const { jobs, stats, platforms, setSelectedJob } = useJobs();
   const [pulse, setPulse] = useState(false);
 
   useEffect(() => {
@@ -21,8 +21,9 @@ export default function Dashboard({ setActiveTab }) {
             background: "linear-gradient(135deg, #0d0d1a 0%, #13132b 100%)",
             border: `1px solid ${s.color}22`,
             borderRadius: 12, padding: "18px 20px",
-            boxShadow: `0 0 20px ${s.color}10`
-          }}>
+            boxShadow: `0 0 20px ${s.color}10`,
+            cursor: "pointer"
+          }} onClick={() => s.label === "Jobs Matched" ? setActiveTab("Job Feed") : s.label === "Auto-Applied" ? setActiveTab("Applications") : null}>
             <div style={{ fontSize: 28, fontWeight: 900, color: s.color, fontFamily: "monospace", lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 11, color: "#666", marginTop: 4, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>{s.label}</div>
             <div style={{ fontSize: 11, color: s.color, marginTop: 6, opacity: 0.8 }}>{s.delta}</div>
@@ -45,9 +46,10 @@ export default function Dashboard({ setActiveTab }) {
           {jobs.slice(0, 4).map(job => (
             <div key={job.id} style={{
               background: "#0d0d1a", border: "1px solid #1e1e3a", borderRadius: 10,
-              padding: "14px 16px", marginBottom: 10, transition: "border-color 0.2s",
+              padding: "14px 16px", marginBottom: 10, transition: "all 0.2s",
               cursor: "pointer"
             }}
+              onClick={() => setSelectedJob(job)}
               onMouseEnter={e => e.currentTarget.style.borderColor = "#00e5ff44"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "#1e1e3a"}
             >

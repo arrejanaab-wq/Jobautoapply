@@ -5,10 +5,18 @@ import Dashboard from './pages/Dashboard';
 import ProfileTab from './pages/ProfileTab';
 import JobFeedTab from './pages/JobFeedTab';
 import SettingsTab from './pages/SettingsTab';
+import Login from './pages/Login';
+
+import JobDetailsModal from './components/JobDetailsModal';
 
 function AppContent() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("Dashboard");
   const { profileData } = useJobs();
+
+  if (!isLoggedIn) {
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
 
   return (
     <div style={{
@@ -17,6 +25,7 @@ function AppContent() {
       color: "#ddd",
       fontFamily: "'Sora', 'DM Sans', 'Segoe UI', sans-serif",
     }}>
+      <JobDetailsModal />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;900&display=swap');
         * { box-sizing: border-box; }
@@ -44,12 +53,24 @@ function AppContent() {
             }}>{tab}</button>
           ))}
         </nav>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#69ff47", boxShadow: "0 0 8px #69ff47", animation: "scan 2s infinite" }} />
-          <span style={{ fontSize: 11, color: "#69ff47", fontFamily: "monospace", fontWeight: 700 }}>RUNNING</span>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #1a1a3a, #2a2a5a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, border: "1px solid #2a2a4a" }}>
-            {profileData.name ? profileData.name[0] : 'V'}
+        <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#69ff47", boxShadow: "0 0 8px #69ff47", animation: "scan 2s infinite" }} />
+            <span style={{ fontSize: 11, color: "#69ff47", fontFamily: "monospace", fontWeight: 700 }}>RUNNING</span>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #1a1a3a, #2a2a5a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, border: "1px solid #2a2a4a" }}>
+              {profileData.name ? profileData.name[0] : 'V'}
+            </div>
           </div>
+          <button 
+            onClick={() => setIsLoggedIn(false)}
+            style={{
+              background: "transparent", border: "1px solid #2a2a4a", borderRadius: 6,
+              padding: "4px 10px", color: "#555", fontSize: 11, cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = "#ff6b6b"}
+            onMouseLeave={e => e.currentTarget.style.color = "#555"}
+          >LOGOUT</button>
         </div>
       </div>
 

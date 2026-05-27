@@ -4,7 +4,7 @@ import MatchBar from '../components/MatchBar';
 import StatusBadge from '../components/StatusBadge';
 
 export default function JobFeedTab({ filter: initialFilter = "All" }) {
-  const { jobs } = useJobs();
+  const { jobs, setSelectedJob } = useJobs();
   const [filter, setFilter] = useState(initialFilter);
   const filters = ["All", "Auto-Applied", "Shortlisted", "Pending Review"];
   const filtered = filter === "All" ? jobs : jobs.filter(j => j.status === filter);
@@ -22,10 +22,15 @@ export default function JobFeedTab({ filter: initialFilter = "All" }) {
         ))}
       </div>
       {filtered.map(job => (
-        <div key={job.id} style={{
-          background: "#0d0d1a", border: "1px solid #1e1e3a", borderRadius: 12,
-          padding: "18px 20px", marginBottom: 12
-        }}>
+        <div key={job.id} 
+          onClick={() => setSelectedJob(job)}
+          style={{
+            background: "#0d0d1a", border: "1px solid #1e1e3a", borderRadius: 12,
+            padding: "18px 20px", marginBottom: 12, cursor: "pointer"
+          }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = "#00e5ff44"}
+          onMouseLeave={e => e.currentTarget.style.borderColor = "#1e1e3a"}
+        >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <div style={{ fontWeight: 800, color: "#eee", fontSize: 15 }}>{job.title}</div>
@@ -46,8 +51,14 @@ export default function JobFeedTab({ filter: initialFilter = "All" }) {
             ))}
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-            <button style={{ background: "#69ff4715", border: "1px solid #69ff4730", borderRadius: 8, padding: "7px 18px", color: "#69ff47", fontSize: 12, cursor: "pointer", fontWeight: 700 }}>View Application</button>
-            <button style={{ background: "transparent", border: "1px solid #1e1e3a", borderRadius: 8, padding: "7px 18px", color: "#555", fontSize: 12, cursor: "pointer" }}>Skip</button>
+            <button 
+              onClick={(e) => { e.stopPropagation(); setSelectedJob(job); }}
+              style={{ background: "#69ff4715", border: "1px solid #69ff4730", borderRadius: 8, padding: "7px 18px", color: "#69ff47", fontSize: 12, cursor: "pointer", fontWeight: 700 }}>
+              {job.status === "Auto-Applied" ? "View Application" : "Quick Apply"}
+            </button>
+            <button 
+              onClick={(e) => e.stopPropagation()}
+              style={{ background: "transparent", border: "1px solid #1e1e3a", borderRadius: 8, padding: "7px 18px", color: "#555", fontSize: 12, cursor: "pointer" }}>Skip</button>
           </div>
         </div>
       ))}
