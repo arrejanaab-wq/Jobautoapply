@@ -8,11 +8,12 @@ import SettingsTab from './pages/SettingsTab';
 import Login from './pages/Login';
 
 import JobDetailsModal from './components/JobDetailsModal';
+import NotificationTray from './components/NotificationTray';
 
 function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("Dashboard");
-  const { profileData } = useJobs();
+  const { profileData, notifications, removeNotification } = useJobs();
 
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
@@ -26,6 +27,7 @@ function AppContent() {
       fontFamily: "'Sora', 'DM Sans', 'Segoe UI', sans-serif",
     }}>
       <JobDetailsModal />
+      <NotificationTray notifications={notifications} removeNotification={removeNotification} />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;900&display=swap');
         * { box-sizing: border-box; }

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MOCK_JOBS, PLATFORMS, STATS } from '../data/mockData';
+import { fetchRealJobs } from '../services/jobService';
 
 const JobContext = createContext();
 
@@ -13,6 +14,7 @@ export const useJobs = () => {
 
 export const JobProvider = ({ children }) => {
   const [jobs, setJobs] = useState(MOCK_JOBS);
+  const [loading, setLoading] = useState(false);
   const [platforms] = useState(PLATFORMS);
   const [stats, setStats] = useState(STATS);
   const [profileData, setProfileData] = useState({
@@ -31,6 +33,35 @@ export const JobProvider = ({ children }) => {
   });
 
   const [selectedJob, setSelectedJob] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
+  const addNotification = (message, type = 'info') => {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 5000);
+  };
+
+  const removeNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  // Real-time Fetch Engine
+  const refreshJobs = async () => {
+    setLoading(true);
+    const query = `${profileData.role} in ${profileData.locations}`;
+    const realJobs = await fetchRealJobs(query);
+    if (realJobs.length > 0) {
+      setJobs(realJobs);
+      addNotification(`Found ${realJobs.length} new live jobs!`, 'info');
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    refreshJobs();
+  }, []);
 
   // Live Discovery Engine (Simulates finding new jobs on the web)
   useEffect(() => {
@@ -79,11 +110,13 @@ export const JobProvider = ({ children }) => {
 
         if (!jobToApply) return prevJobs;
 
+        addNotification(`Applied to ${jobToApply.title} at ${jobToApply.company}`, 'success');
+
         return prevJobs.map(j => 
           j.id === jobToApply.id ? { ...j, status: "Auto-Applied", time: "Just now" } : j
         );
       });
-    }, 5000); 
+    }, 10000); 
 
     return () => clearInterval(interval);
   }, [settings.autoApply, settings.minMatch, profileData]);
@@ -114,6 +147,14 @@ export const JobProvider = ({ children }) => {
 
   const value = {
     jobs,
+    setJobs,
+    loading,
+    setLoading,
+    notifications,
+    addNotification,
+    removeNotification,
+    refreshJobs,
+    fetchRealJobs,
     platforms,
     stats,
     profileData,

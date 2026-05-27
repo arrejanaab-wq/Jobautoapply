@@ -4,24 +4,100 @@ import MatchBar from '../components/MatchBar';
 import StatusBadge from '../components/StatusBadge';
 
 export default function JobFeedTab({ filter: initialFilter = "All" }) {
-  const { jobs, setSelectedJob } = useJobs();
+  const { jobs, loading, fetchRealJobs, setJobs, setLoading, profileData, setSelectedJob } = useJobs();
   const [filter, setFilter] = useState(initialFilter);
+  const [searchQuery, setSearchQuery] = useState(profileData.role);
+  const [searchLocation, setSearchLocation] = useState(profileData.locations);
+
   const filters = ["All", "Auto-Applied", "Shortlisted", "Pending Review"];
   const filtered = filter === "All" ? jobs : jobs.filter(j => j.status === filter);
 
+  const handleSearch = async (e) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+    const query = `${searchQuery} in ${searchLocation}`;
+    const realJobs = await fetchRealJobs(query);
+    if (realJobs.length > 0) {
+      setJobs(realJobs);
+    }
+    setLoading(false);
+  };
+
   return (
     <div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-        {filters.map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            background: filter === f ? "#00e5ff" : "transparent",
-            border: `1px solid ${filter === f ? "#00e5ff" : "#1e1e3a"}`,
-            borderRadius: 20, padding: "6px 16px", color: filter === f ? "#000" : "#666",
-            fontSize: 12, cursor: "pointer", fontWeight: filter === f ? 700 : 400, transition: "all 0.2s"
-          }}>{f}</button>
-        ))}
+      {/* Search Bar */}
+      <form onSubmit={handleSearch} style={{
+        display: "flex", gap: 10, marginBottom: 20, background: "#0d0d1a",
+        padding: "15px", borderRadius: 12, border: "1px solid #1e1e3a"
+      }}>
+        <input 
+          type="text" 
+          placeholder="Job Title (e.g. React Developer)" 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            flex: 2, background: "#1a1a2e", border: "1px solid #2a2a4a",
+            borderRadius: 8, padding: "10px 15px", color: "#eee", fontSize: 13
+          }}
+        />
+        <input 
+          type="text" 
+          placeholder="Location (e.g. Remote)" 
+          value={searchLocation}
+          onChange={(e) => setSearchLocation(e.target.value)}
+          style={{
+            flex: 1, background: "#1a1a2e", border: "1px solid #2a2a4a",
+            borderRadius: 8, padding: "10px 15px", color: "#eee", fontSize: 13
+          }}
+        />
+        <button 
+          type="submit"
+          disabled={loading}
+          style={{
+            background: "#00e5ff", border: "none", borderRadius: 8,
+            padding: "10px 20px", color: "#000", fontWeight: 700,
+            cursor: "pointer", opacity: loading ? 0.5 : 1
+          }}>
+          {loading ? "SEARCHING..." : "SEARCH"}
+        </button>
+      </form>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 8 }}>
+          {filters.map(f => (
+            <button key={f} onClick={() => setFilter(f)} style={{
+              background: filter === f ? "#00e5ff" : "transparent",
+              border: `1px solid ${filter === f ? "#00e5ff" : "#1e1e3a"}`,
+              borderRadius: 20, padding: "6px 16px", color: filter === f ? "#000" : "#666",
+              fontSize: 12, cursor: "pointer", fontWeight: filter === f ? 700 : 400, transition: "all 0.2s"
+            }}>{f}</button>
+          ))}
+        </div>
+        <button 
+          onClick={refreshJobs}
+          disabled={loading}
+          style={{
+            background: "transparent", border: "1px solid #1e1e3a", borderRadius: 8,
+            padding: "6px 12px", color: "#00e5ff", fontSize: 11, cursor: "pointer",
+            opacity: loading ? 0.5 : 1
+          }}>
+          {loading ? "FETCHING..." : "🔄 REFRESH"}
+        </button>
       </div>
-      {filtered.map(job => (
+
+      {loading && (
+        <div style={{ textAlign: "center", padding: "40px", color: "#00e5ff", fontFamily: "monospace", letterSpacing: 2 }}>
+          SCANNING FOR REAL-TIME JOBS...
+        </div>
+      )}
+
+      {!loading && filtered.length === 0 && (
+        <div style={{ textAlign: "center", padding: "40px", color: "#555" }}>
+          No jobs found for this filter.
+        </div>
+      )}
+
+      {!loading && filtered.map(job => (
         <div key={job.id} 
           onClick={() => setSelectedJob(job)}
           style={{

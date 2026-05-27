@@ -11,11 +11,22 @@ export default function ProfileTab() {
   const handleFile = (file) => {
     if (!file) return;
     setUploading(true);
+    setUploaded(false);
+    
+    // Simulate AI Parsing
     setTimeout(() => {
       setUploading(false);
       setUploaded(true);
-      updateProfile({ resumeFile: file.name });
-    }, 2200);
+      
+      // Update profile with "parsed" data based on the file name or just a sample
+      updateProfile({ 
+        resumeFile: file.name,
+        name: "Vishal Singh", // Mock extraction
+        role: "Senior React Developer", // Mock extraction
+        skills: "React, Node.js, TypeScript, AWS, Tailwind CSS", // Mock extraction
+        locations: "Remote, Bangalore"
+      });
+    }, 3000);
   };
 
   const fields = [

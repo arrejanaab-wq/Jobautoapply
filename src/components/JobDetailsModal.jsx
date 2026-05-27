@@ -54,14 +54,33 @@ export default function JobDetailsModal() {
           </div>
         </div>
 
+        <div style={{ 
+          marginBottom: 24, 
+          maxHeight: '200px', 
+          overflowY: 'auto', 
+          paddingRight: '10px',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#1e1e3a transparent'
+        }}>
+          <div style={{ fontSize: 11, color: '#555', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700, marginBottom: 12 }}>Job Description</div>
+          <div style={{ fontSize: 13, color: '#bbb', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+            {selectedJob.description || "No description available for this position."}
+          </div>
+        </div>
+
         <div style={{ display: 'flex', gap: 12 }}>
-          <button style={{
-            flex: 1, background: 'linear-gradient(135deg, #00e5ff, #0088aa)',
-            border: 'none', borderRadius: 10, padding: '14px',
-            color: '#000', fontWeight: 900, fontSize: 14, cursor: 'pointer'
-          }}>
+          <a 
+            href={selectedJob.applyLink} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{
+              flex: 1, background: 'linear-gradient(135deg, #00e5ff, #0088aa)',
+              border: 'none', borderRadius: 10, padding: '14px',
+              color: '#000', fontWeight: 900, fontSize: 14, cursor: 'pointer',
+              textAlign: 'center', textDecoration: 'none'
+            }}>
             {selectedJob.status === "Auto-Applied" ? "VIEW APPLICATION" : "APPLY NOW"}
-          </button>
+          </a>
           <button style={{
             flex: 1, background: 'transparent', border: '1px solid #1e1e3a',
             borderRadius: 10, padding: '14px', color: '#eee', fontWeight: 700, cursor: 'pointer'
